@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Inventory Item</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main>
+    <h1>Add New Inventory Item</h1>
+    <% if (messages && messages.length > 0) { %>
+        <ul class="notice">
+            <% messages.forEach(function(msg) { %>
+                <li><%= msg %></li>
+            <% }) %>
+        </ul>
+    <% } %>
+    <form id="addInventoryForm" class="add-inventory-form" action="/inv/add-inventory" method="post" autocomplete="off">
+      <label for="classificationList">Classification:</label>
+      <%- classificationList %>
+
+      <label for="inv_make">Make:</label>
+      <input type="text" id="inv_make" name="inv_make" required pattern="^[A-Za-z0-9 ]+$"
+        value="<%= typeof inv_make !== 'undefined' ? inv_make : '' %>">
+
+      <label for="inv_model">Model:</label>
+      <input type="text" id="inv_model" name="inv_model" required pattern="^[A-Za-z0-9 ]+$"
+        value="<%= typeof inv_model !== 'undefined' ? inv_model : '' %>">
+
+      <label for="inv_year">Year:</label>
+      <input type="number" id="inv_year" name="inv_year" min="1900" max="2099" required
+        value="<%= typeof inv_year !== 'undefined' ? inv_year : '' %>">
+
+      <label for="inv_description">Description:</label>
+      <textarea id="inv_description" name="inv_description" required><%= typeof inv_description !== 'undefined' ? inv_description : '' %></textarea>
+
+      <label for="inv_image">Image Path:</label>
+      <input type="text" id="inv_image" name="inv_image" required
+        value="<%= typeof inv_image !== 'undefined' ? inv_image : '/images/vehicles/no-image.png' %>">
+
+      <label for="inv_thumbnail">Thumbnail Path:</label>
+      <input type="text" id="inv_thumbnail" name="inv_thumbnail" required
+        value="<%= typeof inv_thumbnail !== 'undefined' ? inv_thumbnail : '/images/vehicles/no-image-tn.png' %>">
+
+      <label for="inv_price">Price:</label>
+      <input type="number" id="inv_price" name="inv_price" min="0" step="0.01" required
+        value="<%= typeof inv_price !== 'undefined' ? inv_price : '' %>">
+
+      <label for="inv_miles">Miles:</label>
+      <input type="number" id="inv_miles" name="inv_miles" min="0" required
+        value="<%= typeof inv_miles !== 'undefined' ? inv_miles : '' %>">
+
+      <label for="inv_color">Color:</label>
+      <input type="text" id="inv_color" name="inv_color" required pattern="^[A-Za-z0-9 ]+$"
+        value="<%= typeof inv_color !== 'undefined' ? inv_color : '' %>">
+
+      <button type="submit">Add Inventory Item</button>
+    </form>
+    <div class="management-link">
+      <a href="/inv/">Back to Management</a>
+    </div>
+  </main>
+  <script>
+    // Client-side validation for all fields
+    document.getElementById('addInventoryForm').addEventListener('submit', function(e) {
+      let valid = true;
+      let msg = "";
+
+      // Example: Make and Model validation
+      const make = document.getElementById('inv_make').value.trim();
+      const model = document.getElementById('inv_model').value.trim();
+      const color = document.getElementById('inv_color').value.trim();
+      const regex = /^[A-Za-z0-9 ]+$/;
+
+      if (!regex.test(make)) { valid = false; msg += "Make must be alphanumeric.\n"; }
+      if (!regex.test(model)) { valid = false; msg += "Model must be alphanumeric.\n"; }
+      if (!regex.test(color)) { valid = false; msg += "Color must be alphanumeric.\n"; }
+
+      // Year validation
+      const year = parseInt(document.getElementById('inv_year').value, 10);
+      if (isNaN(year) || year < 1900 || year > 2099) { valid = false; msg += "Year must be between 1900 and 2099.\n"; }
+
+      // Price and Miles validation
+      const price = parseFloat(document.getElementById('inv_price').value);
+      const miles = parseInt(document.getElementById('inv_miles').value, 10);
+      if (isNaN(price) || price < 0) { valid = false; msg += "Price must be a positive number.\n"; }
+      if (isNaN(miles) || miles < 0) { valid = false; msg += "Miles must be a positive number.\n"; }
+
+      // Description validation
+      const desc = document.getElementById('inv_description').value.trim();
+      if (!desc) { valid = false; msg += "Description is required.\n"; }
+
+      // Classification validation
+      const classification = document.getElementById('classificationList').value;
+      if (!classification) { valid = false; msg += "Classification is required.\n"; }
+
+      if (!valid) {
+        alert(msg);
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>

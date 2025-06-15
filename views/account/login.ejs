@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main class="login-main">
+    <h1><%= title %></h1>
+    <%- messages() %>
+      <% if (errors) { %>
+    <ul class="notice">
+    <% errors.array().forEach(error => { %>
+    <li><%= error.msg %></li>
+    <%  }) %>
+    </ul>
+    <% } %>
+    <form class="login-form" id="loginForm" action="/account/login" method="post">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Login</button>
+    </form>
+    <div class="register-link">
+      <p>Don't have an account? <a href="/account/register">Register here</a></p>
+    </div>
+  </main>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      let errorMsg = '';
+      if (!email) errorMsg += 'Email is required.\n';
+      if (!password) errorMsg += 'Password is required.\n';
+      if (errorMsg) {
+        alert(errorMsg);
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
