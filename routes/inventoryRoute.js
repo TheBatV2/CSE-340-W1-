@@ -18,14 +18,28 @@ router.get(
   utilities.handleErrors(invController.buildDetail)
 )
 
-router.get("/", utilities.handleErrors(invController.buildManagement))
-router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification))
-router.get("/add-inventory", utilities.handleErrors(invController.buildAddInventory))
+router.get(
+  "/",
+  utilities.requireEmployeeOrAdmin,
+  utilities.handleErrors(invController.buildManagement)
+)
+
+router.get(
+  "/add-classification",
+  utilities.requireEmployeeOrAdmin,
+  utilities.handleErrors(invController.buildAddClassification)
+)
+router.get(
+  "/add-inventory",
+  utilities.requireEmployeeOrAdmin,
+  utilities.handleErrors(invController.buildAddInventory)
+)
 // Add handleErrors to any other routes as needed
 
 // POST route for adding a classification
 router.post(
   "/add-classification",
+  utilities.requireEmployeeOrAdmin,
   invValidate.classificationRules(),
   invValidate.checkClassificationData,
   utilities.handleErrors(invController.addClassification)
@@ -37,6 +51,36 @@ router.post(
   invValidate.inventoryRules(),
   invValidate.checkInventoryData,
   utilities.handleErrors(invController.addInventory)
+)
+
+// Route to deliver the edit inventory item view
+router.get(
+  "/edit/:inv_id",
+  utilities.handleErrors(invController.buildEditInventoryView)
+)
+
+// Route to handle updating inventory item
+router.post(
+  "/update",
+  invValidate.inventoryRules(),
+  invValidate.checkUpdateData,
+  utilities.handleErrors(invController.updateInventory)
+)
+
+router.get(
+  "/getInventory/:classification_id",
+   utilities.handleErrors(invController.getInventoryJSON))
+
+// Route to deliver the delete inventory item confirmation view
+router.get(
+  "/delete/:inv_id",
+  utilities.handleErrors(invController.buildDeleteInventoryView)
+)
+
+// Route to handle deleting inventory item
+router.post(
+  "/delete",
+  utilities.handleErrors(invController.deleteInventory)
 )
 
 module.exports = router

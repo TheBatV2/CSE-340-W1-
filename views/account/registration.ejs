@@ -9,13 +9,19 @@
 <body>
   <main class="login-main">
     <h1><%= title %></h1>
-    <%- messages() %>
-    <% if (errors) { %>
-    <ul class="notice">
-    <% errors.array().forEach(error => { %>
-    <li><%= error.msg %></li>
-    <%  }) %>
-    </ul>
+    <% if (typeof errors !== 'undefined' && errors && errors.array && errors.array().length > 0) { %>
+      <ul class="notice">
+        <% errors.array().forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    <% } %>
+    <% if (messages && messages.length > 0) { %>
+      <ul class="notice">
+        <% messages.forEach(function(msg) { %>
+          <li><%= msg %></li>
+        <% }) %>
+      </ul>
     <% } %>
     <form class="login-form" id="registerForm" action="/account/register" method="post" autocomplete="off">
       <label for="account_firstname">First Name:</label>

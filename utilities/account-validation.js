@@ -69,6 +69,7 @@ validate.checkRegData = async (req, res, next) => {
       errors,
       title: "Registration",
       nav,
+      messages: req.flash("notice"),
       account_firstname,
       account_lastname,
       account_email,
@@ -83,11 +84,11 @@ validate.checkRegData = async (req, res, next) => {
 * ********************************* */
 validate.loginRules = () => {
   return [
-    body("email")
+    body("account_email")
       .trim()
       .isEmail()
       .withMessage("A valid email is required."),
-    body("password")
+    body("account_password")
       .trim()
       .notEmpty()
       .withMessage("Password is required.")
@@ -106,9 +107,77 @@ validate.checkLoginData = async (req, res, next) => {
       errors,
       title: "Login",
       nav,
+      messages: req.flash("notice"),
       email
     })
     return
+  }
+  next()
+}
+
+/* **********************************
+*  Account Update Validation Rules
+* ********************************* */
+validate.updateAccountRules = () => [
+  body("account_firstname")
+    .trim().notEmpty().withMessage("First name is required."),
+  body("account_lastname")
+    .trim().notEmpty().withMessage("Last name is required."),
+  body("account_email")
+    .trim().isEmail().withMessage("A valid email is required.")
+    .custom(async (email, { req }) => {
+      // Only check for duplicate if email is changed
+      const existing = await accountModel.getAccountByEmail(email)
+      if (existing && existing.account_id != req.body.account_id) {
+        throw new Error("Email already exists. Please use a different email.")
+      }
+      return true
+    }),
+]
+
+/* **********************************
+*  Password Validation Rules
+* ********************************* */
+validate.passwordRules = () => [
+  body("account_password")
+    .trim()
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/)
+    .withMessage("Password must be at least 12 characters and include uppercase, lowercase, number, and special character."),
+]
+
+/* ******************************
+* Check account update data and return errors or continue
+* ***************************** */
+validate.checkUpdateAccountData = (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    req.flash("notice", errors.array().map(e => e.msg))
+    return res.render("account/update", {
+      title: "Update Account",
+      messages: req.flash("notice"),
+      errors: errors.array(),
+      account_firstname: req.body.account_firstname,
+      account_lastname: req.body.account_lastname,
+      account_email: req.body.account_email,
+      account_id: req.body.account_id,
+    })
+  }
+  next()
+}
+
+/* ******************************
+* Check password data and return errors or continue
+* ***************************** */
+validate.checkPasswordData = (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    req.flash("notice", errors.array().map(e => e.msg))
+    return res.render("account/update", {
+      title: "Update Account",
+      messages: req.flash("notice"),
+      errors: errors.array(),
+      account_id: req.body.account_id,
+    })
   }
   next()
 }

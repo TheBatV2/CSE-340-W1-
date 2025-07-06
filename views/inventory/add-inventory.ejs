@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add New Inventory Item</title>
-  <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-  <main>
-    <h1>Add New Inventory Item</h1>
+
+
+      <h1>Add New Inventory Item</h1>
     <% if (messages && messages.length > 0) { %>
         <ul class="notice">
             <% messages.forEach(function(msg) { %>
@@ -60,7 +52,7 @@
     <div class="management-link">
       <a href="/inv/">Back to Management</a>
     </div>
-  </main>
+  
   <script>
     // Client-side validation for all fields
     document.getElementById('addInventoryForm').addEventListener('submit', function(e) {
@@ -101,5 +93,4 @@
       }
     });
   </script>
-</body>
-</html>
+

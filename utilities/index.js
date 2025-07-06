@@ -1,5 +1,7 @@
 const invModel = require("../models/inventory-model")
 const Util = {}
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -91,7 +93,7 @@ Util.buildDetailView = function(vehicle) {
 Util.buildClassificationList = async function(classification_id = null) {
   let data = await invModel.getClassifications()
   let classificationList =
-    '<select name="classification_id" id="classificationList" required>'
+    '<select id="classification_id" name="classification_id" required>'
   classificationList += "<option value=''>Choose a Classification</option>"
   data.rows.forEach((row) => {
     classificationList += '<option value="' + row.classification_id + '"'
@@ -105,6 +107,64 @@ Util.buildClassificationList = async function(classification_id = null) {
   })
   classificationList += "</select>"
   return classificationList
+}
+
+/* ****************************************
+* Middleware to check token validity
+**************************************** */
+Util.checkJWTToken = (req, res, next) => {
+  if (req.cookies.jwt) {
+    jwt.verify(
+      req.cookies.jwt,
+      process.env.ACCESS_TOKEN_SECRET,
+      function (err, accountData) {
+        if (err) {
+          req.flash("Please log in")
+          res.clearCookie("jwt")
+          return res.redirect("/account/login")
+        }
+        res.locals.accountData = accountData
+        res.locals.loggedin = 1
+        req.accountData = accountData // <-- ADD THIS LINE
+        next()
+      }
+    )
+  } else {
+    next()
+  }
+}
+
+
+/* ****************************************
+ *  Check Login
+ * ************************************ */
+ Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next()
+  } else {
+    req.flash("notice", "Please log in.")
+    return res.redirect("/account/login")
+  }
+ }
+
+/* ****************************************
+* Restrict access to Employee or Admin
+**************************************** */
+Util.requireEmployeeOrAdmin = (req, res, next) => {
+  const token = req.cookies.jwt
+  if (!token) {
+    req.flash("notice", "You must be logged in as an employee or admin to access this page.")
+    return res.redirect("/account/login")
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, accountData) => {
+    if (err || !accountData || !["Employee", "Admin"].includes(accountData.account_type)) {
+      req.flash("notice", "You do not have permission to access this page.")
+      return res.redirect("/account/login")
+    }
+    // Optionally, attach accountData to req for use in controllers
+    req.accountData = accountData
+    next()
+  })
 }
 
 module.exports = Util

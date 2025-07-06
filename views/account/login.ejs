@@ -9,20 +9,26 @@
 <body>
   <main class="login-main">
     <h1><%= title %></h1>
-    <%- messages() %>
-      <% if (errors) { %>
-    <ul class="notice">
-    <% errors.array().forEach(error => { %>
-    <li><%= error.msg %></li>
-    <%  }) %>
-    </ul>
+    <% if (typeof errors !== 'undefined' && errors && errors.array && errors.array().length > 0) { %>
+      <ul class="notice">
+        <% errors.array().forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    <% } %>
+    <% if (messages && messages.length > 0) { %>
+      <ul class="notice">
+        <% messages.forEach(function(msg) { %>
+          <li><%= msg %></li>
+        <% }) %>
+      </ul>
     <% } %>
     <form class="login-form" id="loginForm" action="/account/login" method="post">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
+      <label for="account_email">Email:</label>
+      <input type="email" id="account_email" name="account_email" required>
 
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
+      <label for="account_password">Password:</label>
+      <input type="password" id="account_password" name="account_password" required>
 
       <button type="submit">Login</button>
     </form>
@@ -32,8 +38,8 @@
   </main>
   <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
+      const email = document.getElementById("account_email").value.trim();
+      const password = document.getElementById("account_password").value.trim();
       let errorMsg = '';
       if (!email) errorMsg += 'Email is required.\n';
       if (!password) errorMsg += 'Password is required.\n';

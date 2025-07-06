@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main>
+ 
+    <% if (accountFirstName && accountType) { %>
+      <div class="add-inventory-form">
+      <h2 class="center-text">Welcome <%= accountFirstName %></h2>
+      <!-- Update Account Information link (always visible) -->
+      <p class="center-text">
+        <a href="/account/update/<%= accountId %>">Update Account Information</a>
+      </p>
+      <% if (accountType === "Employee" || accountType === "Admin") { %>
+        <h3 class="center-text">Inventory Management</h3>
+        <p class="center-text">
+          <a href="/inv/">Go to Inventory Management</a>
+        </p>
+      <% } %>
+    <% } %>
+    <p class="center-text">You're logged in.</p>
+      </div>
+  </main>
+</body>
+</html>
