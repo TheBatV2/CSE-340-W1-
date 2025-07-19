@@ -24,6 +24,23 @@
     <% } %>
     <p class="center-text">You're logged in.</p>
       </div>
+    <!-- Add this after your existing welcome section -->
+    <% if (userReviews && userReviews.length > 0) { %>
+      <div class="user-reviews-section">
+        <h3>Your Reviews</h3>
+        <% userReviews.forEach(review => { %>
+          <div class="user-review-item">
+            <p><strong>Vehicle:</strong> <%= review.inv_year %> <%= review.inv_make %> <%= review.inv_model %></p>
+            <p class="review-text"><%= review.review_text %></p>
+            <p class="review-date">Posted: <%= new Date(review.review_date).toLocaleDateString() %></p>
+            <div class="review-actions">
+              <a href="/review/edit/<%= review.review_id %>" class="edit-link">Edit</a>
+              <a href="/review/delete/<%= review.review_id %>" class="delete-link" onclick="return confirm('Are you sure you want to delete this review?')">Delete</a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
   </main>
 </body>
 </html>

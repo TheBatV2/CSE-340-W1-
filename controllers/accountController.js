@@ -8,7 +8,15 @@ const jwt = require("jsonwebtoken")
 * *************************************** */
 async function buildAccount(req, res) {
   let nav = await utilities.getNav()
-  const accountData = req.accountData || {} // Get account data from request, if available
+  const accountData = req.accountData || {}
+  
+  // Get user's reviews
+  let userReviews = []
+  if (accountData.account_id) {
+    const reviewModel = require("../models/review-model")
+    userReviews = await reviewModel.getReviewsByAccountId(accountData.account_id)
+  }
+  
   res.render("account/management", {
     title: "Account Management",
     nav,
@@ -17,7 +25,7 @@ async function buildAccount(req, res) {
     accountFirstName: accountData.account_firstname,
     accountType: accountData.account_type,
     accountId: accountData.account_id,
-    
+    userReviews: userReviews,
   })
 }
 
