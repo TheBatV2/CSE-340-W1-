@@ -1,11 +1,8 @@
-<%- include('../partials/head') %>
-<%- include('../partials/header') %>
-<%- include('../partials/nav') %>
 
-<main>
-  <div class="add-inventory-form">
+  <div class="edit-review-container">
     <h1>Edit Review</h1>
-    <%- messages() %>
+    <%- messages %>
+    
     <% if (errors) { %>
       <ul class="notice">
         <% errors.forEach(function(error) { %>
@@ -14,21 +11,26 @@
       </ul>
     <% } %>
     
-    <form action="/review/edit" method="post">
-      <p><strong>Vehicle:</strong> <%= inv_year %> <%= inv_make %> <%= inv_model %></p>
-      
-      <label for="review_text">Review:</label>
-      <textarea id="review_text" name="review_text" rows="6" required><%= review_text %></textarea>
+    <div class="vehicle-info-box">
+      <h3>Vehicle Details</h3>
+      <p><strong><%= inv_year %> <%= inv_make %> <%= inv_model %></strong></p>
+    </div>
+    
+    <form class="edit-review-form" action="/review/edit" method="post">
+      <div class="form-group">
+        <label for="review_text">Your Review:</label>
+        <textarea id="review_text" name="review_text" rows="8" required><%= review_text %></textarea>
+        <small class="form-help">Share your experience with this vehicle</small>
+      </div>
       
       <input type="hidden" name="review_id" value="<%= review_id %>">
       
-      <button type="submit">Update Review</button>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Update Review</button>
+        <a href="/account/" class="btn-secondary">Cancel</a>
+      </div>
     </form>
-    
-    <div class="management-link">
-      <a href="/account/">Back to Account Management</a>
-    </div>
   </div>
-</main>
 
-<%- include('../partials/footer') %>
+
+
