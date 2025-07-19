@@ -71,14 +71,27 @@ invController.buildDetail = async function(req, res) {
   const inv_id = req.params.inv_id
   const nav = await utilities.getNav()
   const data = await invModel.getInventoryById(inv_id)
+  
   if (!data) {
-    return res.status(404).render("errors/error", { title: "Vehicle Not Found", message: "Sorry, that vehicle does not exist.", nav })
+    return res.status(404).render("errors/error", { 
+      title: "Vehicle Not Found", 
+      message: "Sorry, that vehicle does not exist.", 
+      nav 
+    })
   }
-  const detail = utilities.buildDetailView(data)
+  
+  // Get reviews for this vehicle
+  const reviewModel = require("../models/review-model")
+  const reviews = await reviewModel.getReviewsByInventoryId(inv_id)
+  
+  // Build the detail view with reviews
+  const detail = utilities.buildDetailView(data, reviews, req.accountData)
+  
   res.render("inventory/detail", {
     title: `${data.inv_make} ${data.inv_model}`,
     nav,
-    detail
+    detail,
+    messages: req.flash("notice")
   })
 }
 

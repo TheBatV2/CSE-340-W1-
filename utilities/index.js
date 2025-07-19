@@ -67,11 +67,13 @@ Util.buildClassificationGrid = async function(data){
  **************************************** */
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
-Util.buildDetailView = function(vehicle) {
+Util.buildDetailView = function(vehicle, reviews = [], accountData = null) {
   if (!vehicle) return "<p>Vehicle not found.</p>"
+  
   const price = Number(vehicle.inv_price).toLocaleString("en-US", { style: "currency", currency: "USD" })
   const miles = Number(vehicle.inv_miles).toLocaleString("en-US")
-  return `
+  
+  let html = `
     <div class="vehicle-detail">
       <div class="vehicle-image">
         <img src="${vehicle.inv_image}" alt="Image of ${vehicle.inv_make} ${vehicle.inv_model}">
@@ -84,7 +86,57 @@ Util.buildDetailView = function(vehicle) {
         <p><strong>Color:</strong> ${vehicle.inv_color}</p>
       </div>
     </div>
+    
+    <section class="reviews-section">
+      <h3>Reviews</h3>
   `
+  
+  // Display existing reviews
+  if (reviews && reviews.length > 0) {
+    html += '<div class="reviews-list">'
+    reviews.forEach(review => {
+      const reviewDate = new Date(review.review_date).toLocaleDateString()
+      html += `
+        <div class="review-item">
+          <p class="review-text">${review.review_text}</p>
+          <p class="review-author">- ${review.screen_name} on ${reviewDate}</p>
+        </div>
+      `
+    })
+    html += '</div>'
+  } else {
+    html += '<p class="no-reviews">No reviews yet. Be the first to review this vehicle!</p>'
+  }
+  
+  // Add review form or login link
+  if (accountData) {
+    // User is logged in - show review form
+    const screenName = accountData.account_firstname.charAt(0) + accountData.account_lastname
+    html += `
+      <div class="add-review-form">
+        <h4>Add Your Review</h4>
+        <form action="/review/add" method="post">
+          <p><strong>Screen name:</strong> ${screenName}</p>
+          <label for="review_text">Review:</label>
+          <textarea id="review_text" name="review_text" rows="4" cols="50" required></textarea>
+          <input type="hidden" name="inv_id" value="${vehicle.inv_id}">
+          <input type="hidden" name="account_id" value="${accountData.account_id}">
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+    `
+  } else {
+    // User not logged in - show login link
+    html += `
+      <div class="login-prompt">
+        <p>Want to add a review? <a href="/account/login">Please log in</a> to submit your review.</p>
+      </div>
+    `
+  }
+  
+  html += '</section>'
+  
+  return html
 }
 
 /* ****************************************
